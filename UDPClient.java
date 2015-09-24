@@ -26,30 +26,36 @@ class UDPClient
          System.exit(0);
       }
 
+      String ip = ipPort.substring(0,ipPort.indexOf(":")); // get ip address
+      // error handling for missing port number
+      if (ipPort.indexOf(":") == ipPort.length()) {
+          System.out.println("There is no Port Number.");
+	  System.exit(0);
+      }
+      String port = ipPort.substring(ipPort.indexOf(":")); // get port number
       // parsing the IP address
-      String hi = "127.0.0.1";
-      String part1 = hi.substring(0,hi.indexOf("."));
-      if (hi.length() > 0)
-         hi = hi.substring(hi.indexOf(".") + 1);
+      String part1 = ip.substring(0,ip.indexOf("."));
+      if (ip.length() > 0)
+         ip = ip.substring(ip.indexOf(".") + 1);
       else {
          System.out.println("incorrect IP");
          System.exit(0);
       }
-      String part2 = hi.substring(0,hi.indexOf("."));
-      if (hi.length() > 0)
-         hi = hi.substring(hi.indexOf(".") + 1);
+      String part2 = ip.substring(0,ip.indexOf("."));
+      if (ip.length() > 0)
+         ip = ip.substring(ip.indexOf(".") + 1);
       else {
          System.out.println("incorrect IP");
          System.exit(0);
       }
-      String part3 = hi.substring(0,hi.indexOf("."));
-      if (hi.length() > 0)
-         hi = hi.substring(hi.indexOf(".") + 1);
+      String part3 = ip.substring(0,ip.indexOf("."));
+      if (ip.length() > 0)
+         ip = ip.substring(ip.indexOf(".") + 1);
       else {
          System.out.println("incorrect IP");
          System.exit(0);
       }
-      String part4 = hi;
+      String part4 = ip;
       byte[] b = {(byte)Integer.parseInt(part1),(byte)Integer.parseInt(part2),
          (byte)Integer.parseInt(part3),(byte)Integer.parseInt(part4)};
 
