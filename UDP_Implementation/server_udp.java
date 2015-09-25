@@ -14,26 +14,46 @@ class server_udp
 
       User[] users = initUsers();
 
-      DatagramSocket serverSocket = new DatagramSocket(portNum);
-      byte[] receiveData = new byte[1024];
-      byte[] sendData = new byte[1024];
+      DatagramSocket sock = new DatagramSocket(portNum);
 
+      while(true) {
+          Object[] obj = new Object[3];
+          try {
+            obj = getData(sock); // obj is as follows:
+                                        // obj[0] is message
+                                        // obj[1] is IPAddress
+                                        // obj[2] is port
+          } catch (IOException e) {
+              System.out.println (e.getMessage());
+              System.out.println ("Something went wrong in recieving the message");
+              continue; // not elegant :P
+          }
 
-      while(true)
-         {
-            receiveData = new byte[1024];
-            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            serverSocket.receive(receivePacket);
-            String sentence = new String( receivePacket.getData());
-            System.out.println("RECEIVED: " + sentence);
-            InetAddress IPAddress = receivePacket.getAddress();
-            int port = receivePacket.getPort();
-            String capitalizedSentence = sentence.toUpperCase();
-            sendData = capitalizedSentence.getBytes();
-            DatagramPacket sendPacket =
-            new DatagramPacket(sendData, sendData.length, IPAddress, port);
-            serverSocket.send(sendPacket);
-         }
+          int isAuth = 0;
+          // isAuth = 0 when message is auth request
+          // isAuth = 1 when message is includes a hash and username
+          // isAuth = 2 when it is unreadable (not in the top 2)
+
+          if (validMessage(obj[0])){
+              isAuth = getMessageType(obj[0]);
+          } else {
+              continue;
+          } 
+          // I hate casting these objects, but i don't know a better solution
+          try {
+              if (isAuth == 0){
+                  String responseToAuth = "<RandStr>" + String.valueOf(getRandomString())+"<End>";
+                  sendData(sock, responseToAuth, (InetAddress) obj[1], (int) obj[2]);
+              } else if (isAuth == 1){
+
+              } else {
+                continue;
+              }
+
+          } catch (Exception e) {
+
+          }
+      }
 
    }
 
@@ -59,6 +79,7 @@ class server_udp
     * error message and exits if there is a problem.
     */
    public static int getPort(String port) {
+
       try {
          return Integer.parseInt(port);
       } catch (NumberFormatException e) {
@@ -70,8 +91,8 @@ class server_udp
    }
 
    /*
-    *
-    *
+    * getRandomString method
+    * @return: char[]   -   64 character string of random letters
     *
     */
    public static char[] getRandomString() {
@@ -80,9 +101,70 @@ class server_udp
       Random rand = new Random();
       char[] text = new char[size];
       for (int i = 0; i < size; i++) {
-          text[i] = chars.charAt(rand.nextInt(size));
+          text[i] = chars.charAt(rand.nextInt(26));
       }
       return text;
+   }
+
+   /*
+    * getData method
+    * @param sock  -   DatagramSocket object to receive info over
+    * @return Object[]   -   size 3 array with recieved message, 
+    *                         IPAddress, and port number
+    *
+    */
+   public static Object[] getData(DatagramSocket sock) throws IOException {
+      Object[] obj = new Object[3];
+
+      byte[] receiveData = new byte[1024];
+      DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+      sock.receive(receivePacket);
+      String response = new String(receivePacket.getData());
+      System.out.println("RECEIVED: " + response);
+      InetAddress IPAddress = receivePacket.getAddress();
+      int port = receivePacket.getPort();  
+      obj[0] = response;
+      obj[1] = IPAddress;
+      obj[2] = port;
+      return obj;
+   }
+
+
+   /*
+    * sendData method
+    * @param  sock     -    DatagramSock object to send info over
+    *         data     -    String of data to send
+    *         IPAddress -   ip address to send to
+    *         port      -   int of which to send to
+    *
+    */
+   public static void sendData(DatagramSocket sock, String data, InetAddress IPAddress, int port) throws IOException {
+      String capitalizedSentence = data.toUpperCase();
+      byte[] sendData = new byte[1024];
+      sendData = capitalizedSentence.getBytes();
+      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+      sock.send(sendPacket);
+   }
+
+   public static boolean validMessage(Object a) {
+        if ( (a != null) && ( ( (String) a).indexOf("<") != -1) ) {
+            return true;
+        } else {
+            System.out.println("Incorrect message recieved.");
+            return false;
+        }
+   }
+
+   public static int getMessageType(Object a) {
+        String in = (String) a;
+        if (in.indexOf("<AR>") != -1) {
+            return 0;
+        } else if (in.indexOf("<EndChar>")!=-1 && in.indexOf("<EndUser>")!=-1
+          && in.indexOf("<Mode>")!=-1 && in.indexOf("<Amount>")!=-1 ) {
+            return 1;
+        }
+        System.out.println("Incorrect message recieved.");
+        return 2;
    }
 
    // Inner class for User

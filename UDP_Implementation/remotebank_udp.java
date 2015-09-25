@@ -48,7 +48,7 @@ class remotebank_udp
 
       //String sentence = inFromUser.readLine();
       //sendData = sentence.getBytes();
-      sendData = "AR".getBytes();
+      sendData = "<AR>".getBytes();
 
       DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, portNum);
       clientSocket.send(sendPacket);

@@ -25,7 +25,10 @@ Amy 		| 	pass 		|	30
 
 
 
-
+<AR>
+<RandStr>randomStringHere<End>
+randomStringHere<EndChar>username<EndUser>hash<Mode>mode<Amount>amount
+yes<Bal>balance
 
 
 
