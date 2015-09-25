@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.Random;
+import java.security.*;
 
 class server_udp
 {
@@ -52,8 +53,8 @@ class server_udp
 		  			// responses[3] is the mode (deposit or withdraw)
 		  			// responses[4] is the amount for change
 		  String thisPass = getPass(users, responses[1]);
-
-
+		  String challenge = hash(responses[1],thisPass,responses[0]);
+		  boolean passes = challenge.equals(responses[2]);
 
               } else {	// AUTH = 2
                 continue;
@@ -193,6 +194,19 @@ class server_udp
 		}
 	}
 	return "";
+   }
+
+   public static String hash(String user, String pass, String challenge) {
+	user = user + pass + challenge;
+	MessageDigest md = null;
+	try {
+		md = MessageDigest.getInstance("MD5");
+	} catch (Exception e) {		// never gonna throw exception
+
+	}
+
+	byte[] theDigest = md.digest(user.getBytes());
+	return new String(theDigest);
    }
 
    // Inner class for User

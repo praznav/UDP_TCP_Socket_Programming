@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.security.*;
 
 class remotebank_udp
 {
@@ -34,6 +35,7 @@ class remotebank_udp
 
       //BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
       DatagramSocket clientSocket = new DatagramSocket();
+      clientSocket.setSoTimeout(10000);
       //InetAddress IPAddress = InetAddress.getByName("localhost");
       InetAddress IPAddress = null;
       try {
@@ -48,16 +50,44 @@ class remotebank_udp
 
       //String sentence = inFromUser.readLine();
       //sendData = sentence.getBytes();
-      sendData = "<AR>".getBytes();
+      boolean notDone = true;
+      while (notDone) {
+	      sendData = "<AR>".getBytes();
 
-      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, portNum);
-      clientSocket.send(sendPacket);
-      DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-      clientSocket.receive(receivePacket);
+	      DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, portNum);
+	      clientSocket.send(sendPacket);
+	      DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+	      try {
+	            clientSocket.receive(receivePacket);
+	      } catch (SocketTimeoutException e) {
+	            System.out.println("Timeout on response. Starting over");
+		    continue;
+	      }
 
-      String modifiedSentence = new String(receivePacket.getData());
-      System.out.println("FROM SERVER:" + modifiedSentence);
+	      String newIn = new String(receivePacket.getData());
+	      newIn = newIn.substring(newIn.indexOf("<RANDSTR>")+9,newIn.indexOf("<END>"));
+	      String hashedString = hash(username, password, newIn);
+	      sendData = new byte[1024];
+	      String modifiedSentence = newIn + "<EndChar>" + username + "<EndUser>" + hashedString + "<Mode>" +  action + "<Amount>" + amount;
+	      sendData = modifiedSentence.getBytes();
+	      System.out.println("FROM SERVER:" + modifiedSentence);
+	      sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, portNum);
+	      clientSocket.send(sendPacket);
 
+	      receiveData = new byte[1024];
+	      receivePacket = new DatagramPacket(receiveData, receiveData.length);
+	      try {
+	            clientSocket.receive(receivePacket);
+	      } catch (SocketTimeoutException e) {
+	            System.out.println("Timeout on response. Starting over");
+		    continue;
+	      }
+	      if (isSuccess(new String(receivePacket.getData()))) {
+		System.out.println("Success!");
+		System.out.println("New Balance is: " + getBalance(new String(receivePacket.getData())));
+	      }
+	      notDone = false;
+      }
       clientSocket.close();
    }
 
@@ -163,4 +193,27 @@ class remotebank_udp
       return 0;
    }
 
+   public static String hash(String user, String pass, String challenge) {
+	user = user + pass + challenge;
+	MessageDigest md = null;
+	try {
+		md = MessageDigest.getInstance("MD5");
+	} catch (Exception e) {		// never gonna throw exception
+
+	}
+
+	byte[] theDigest = md.digest(user.getBytes());
+	return new String(theDigest);
+   }
+
+   public static boolean isSuccess(String in) {
+	if (in != null && in.length()!=0 && in.indexOf("<Bal>")!=-1 && (in.substring(0,in.indexOf("<Bal>")).equals("yes") ) ) {
+		return true;
+	}
+	return false;
+   }
+
+   public static String getBalance(String in) {
+	return in.substring(in.indexOf("<Bal>")+5);
+   }
 }
