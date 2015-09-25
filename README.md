@@ -18,7 +18,7 @@ implemention of both protocols is the same:
 Note: There are three users that are three users on a static list. They are as follows:
 Username 	|	Password 	|	Starting balance
 _________________________________________________
-Jack		|	123			|	10
+Jack		|	123		|	10
 Sam 		|	abc 		| 	20
 Amy 		| 	pass 		|	30
 

@@ -29,7 +29,7 @@ class server_udp
               continue; // not elegant :P
           }
 
-          int isAuth = 0;
+          int isAuth = 2;
           // isAuth = 0 when message is auth request
           // isAuth = 1 when message is includes a hash and username
           // isAuth = 2 when it is unreadable (not in the top 2)
@@ -41,12 +41,21 @@ class server_udp
           } 
           // I hate casting these objects, but i don't know a better solution
           try {
-              if (isAuth == 0){
+              if (isAuth == 0){ // AUTH = 0
                   String responseToAuth = "<RandStr>" + String.valueOf(getRandomString())+"<End>";
                   sendData(sock, responseToAuth, (InetAddress) obj[1], (int) obj[2]);
-              } else if (isAuth == 1){
+              } else if (isAuth == 1){ // AUTH = 1
+		  String[] responses = parseHash((String)obj[0]);	//responses is as follows:
+		  			// responses[0] is the randomString used for indexng
+		  			// responses[1] is the username
+		  			// responses[2] is the hash
+		  			// responses[3] is the mode (deposit or withdraw)
+		  			// responses[4] is the amount for change
+		  String thisPass = getPass(users, responses[1]);
 
-              } else {
+
+
+              } else {	// AUTH = 2
                 continue;
               }
 
@@ -165,6 +174,25 @@ class server_udp
         }
         System.out.println("Incorrect message recieved.");
         return 2;
+   }
+
+   public static String[] parseHash(String in) {
+	String [] parts = new String[5];
+	parts[0] = in.substring(0,in.indexOf("<EndChar>"));
+	parts[1] = in.substring(in.indexOf("<EndChar>")+9,in.indexOf("<EndUser>"));
+	parts[2] = in.substring(in.indexOf("<EndUser>")+9,in.indexOf("<Mode>"));
+	parts[3] = in.substring(in.indexOf("<Mode>")+6, in.indexOf("<Amount>"));
+	parts[4] = in.substring(in.indexOf("<Amount>")+8);
+	return parts;
+   }
+
+   public static String getPass(User[] allUsers, String user) {
+	for (User a : allUsers) {
+		if (a.getUser().equals(user)) {
+			return a.getPass();
+		}
+	}
+	return "";
    }
 
    // Inner class for User
