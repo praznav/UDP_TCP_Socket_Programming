@@ -1,7 +1,7 @@
-Pranav Shenoy
-pshenoy7@gatech.edu
-CS 3251 A - Computer Networking
-CS 3251 Programming Assignment 1. UDP and TCP socket in java.
+Pranav Shenoy 
+pshenoy7@gatech.edu 
+CS 3251 A - Computer Networking 
+CS 3251 Programming Assignment 1. UDP and TCP socket in java. 
 
 RUNNING INSTRUCTIONS
 ----------------------------------------------------
