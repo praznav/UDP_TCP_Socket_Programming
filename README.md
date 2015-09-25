@@ -1,3 +1,41 @@
+Pranav Shenoy
+pshenoy7@gatech.edu
+CS 3251 A - Computer Networking
+CS 3251 Programming Assignment 1. UDP and TCP socket in java.
+
+RUNNING INSTRUCTIONS
+----------------------------------------------------
+There are two folders: UDP_Implementation and TCP_Implementation. You can find the  java files for each implementation in its respective folder. Almost everything was created and tested on linux, so please grade it on linux as well.
+
+implemention of both protocols is the same:
+1) step 1: compile both remotebank and server files.
+2) step 2: start server with port number inputted as an argument
+	example: server_udp 8591
+3) step 3: run the remote bank program
+	example: remotebank_udp 127.0.0.1:8591 name password123 deposit 5
+
+
+Note: There are three users that are three users on a static list. They are as follows:
+Username 	|	Password 	|	Starting balance
+_________________________________________________
+Jack		|	123			|	10
+Sam 		|	abc 		| 	20
+Amy 		| 	pass 		|	30
+
+
+
+
+
+
+
+
+
+
+
+HOMEWORK INSTRUCTIONS
+----------------------------------------------------
+
+
 # UDP_TCP_Socket_Programming
 CS 3251 Programming Assignment 1. UDP and TCP socket in java.
 
