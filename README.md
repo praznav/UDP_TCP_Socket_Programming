@@ -5,7 +5,11 @@ CS 3251 Programming Assignment 1. UDP and TCP socket in java.
 
 RUNNING INSTRUCTIONS
 ----------------------------------------------------
-There are two folders: UDP_Implementation and TCP_Implementation. You can find the  java files for each implementation in its respective folder. Almost everything was created and tested on linux, so please grade it on linux as well.
+There are two folders: UDP_Implementation and TCP_Implementation. You can find the  java files for each implementation in its respective folder. Almost everything was created and tested on linux, so please grade it on linux as well. To enter debug mode, add the flag "-d" at the end of the command line instruction.
+The amount of money deposited or withdrawn must be an integer. Trying to deposit or withdraw a non-integer amount will result in an error message. Adding functionality for floating point is probably very easy, but is not the focus of this assignment.
+
+Note: 	UDP timeout is set to 10 seconds. You can lower this while testing if it will speed things up. It is around line 33. Commented very clearly.
+		Timeout just sends another authentication request. There is no limit to the number of timeouts.
 
 implemention of both protocols is the same:
 1) step 1: compile both remotebank and server files.
@@ -18,16 +22,16 @@ implemention of both protocols is the same:
 Note: There are three users that are three users on a static list. They are as follows:
 Username 	|	Password 	|	Starting balance
 _________________________________________________
-Jack		|	123		|	10
+Jack		|	123			|	10
 Sam 		|	abc 		| 	20
 Amy 		| 	pass 		|	30
 
+Usernames and passwords are case-sensitive. Modes are not case sensitive. ie: "Deposit" is the same as "deposit"
 
 
-
-<AR>
-<RandStr>randomStringHere<End>
-randomStringHere<EndChar>username<EndUser>hash<Mode>mode<Amount>amount
+<ar>
+<randstr>randomStringHere<end>
+randomStringHere<endchar>username<enduser>hash<mode>mode<amount>amount
 yes<Bal>balance<End>
 
 
