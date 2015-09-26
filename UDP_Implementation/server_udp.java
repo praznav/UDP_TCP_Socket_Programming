@@ -55,6 +55,18 @@ class server_udp
 		  String thisPass = getPass(users, responses[1]);
 		  String challenge = hash(responses[1],thisPass,responses[0]);
 		  boolean passes = challenge.equals(responses[2]);
+		  String responseToChall = "<Bal>";
+		  if (passes) {
+		  	responseToChall = "yes" + responseToChall;
+			verifyInputs(responses[3],responses[4]);
+			int balance = getNewBalance(users, responses[1], responses[3], responses[4]);
+			responseToChall = responseToChall + balance;
+			sendData(sock, responseToChall, (InetAddress) obj[1], (int) obj[2] );
+			System.out.println("hihi");
+		  } else {
+		  	responseToChall = "no" + responseToChall;
+			sendData(sock, responseToChall, (InetAddress) obj[1], (int) obj[2]);
+		  }
 
               } else {	// AUTH = 2
                 continue;
@@ -183,7 +195,7 @@ class server_udp
 	parts[1] = in.substring(in.indexOf("<EndChar>")+9,in.indexOf("<EndUser>"));
 	parts[2] = in.substring(in.indexOf("<EndUser>")+9,in.indexOf("<Mode>"));
 	parts[3] = in.substring(in.indexOf("<Mode>")+6, in.indexOf("<Amount>"));
-	parts[4] = in.substring(in.indexOf("<Amount>")+8);
+	parts[4] = in.substring(in.indexOf("<Amount>")+8, in.indexOf("<End>"));
 	return parts;
    }
 
@@ -194,6 +206,41 @@ class server_udp
 		}
 	}
 	return "";
+   }
+
+   public static void verifyInputs(String a, String b) {
+	if (!(a.equals("Deposit") || a.equals("Withdraw"))) {
+		System.out.println("Improper input");
+		System.exit(0);
+	}
+	try {
+		System.out.println(b);
+		Integer.parseInt(b);
+	} catch (NumberFormatException e) {
+		System.out.println("amount entered is not a number");
+		System.exit(0);
+	}
+
+   }
+
+   public static int getNewBalance (User[] allUsers, String name, String a, String b) {
+	int amount = Integer.parseInt(b);
+	if (a.equals("deposit")) {
+		for (User user : allUsers) {
+			if (user.getUser().equals(name)) {
+				user.addMoney(amount);
+				return user.getBalance();
+			}
+		}
+	} else {
+		for (User user : allUsers) {
+			if (user.getUser().equals(name)) {
+				user.addMoney(-amount);
+				return user.getBalance();
+			}
+		}
+	}
+	return 0;
    }
 
    public static String hash(String user, String pass, String challenge) {
@@ -241,6 +288,10 @@ class server_udp
 
       public String getPass() {
           return pass;
+      }
+
+      public int getBalance() {
+      	  return balance;
       }
 
       public String toString() {

@@ -68,7 +68,7 @@ class remotebank_udp
 	      newIn = newIn.substring(newIn.indexOf("<RANDSTR>")+9,newIn.indexOf("<END>"));
 	      String hashedString = hash(username, password, newIn);
 	      sendData = new byte[1024];
-	      String modifiedSentence = newIn + "<EndChar>" + username + "<EndUser>" + hashedString + "<Mode>" +  action + "<Amount>" + amount;
+	      String modifiedSentence = newIn + "<EndChar>" + username + "<EndUser>" + hashedString + "<Mode>" +  action + "<Amount>" + amount + "<End>";
 	      sendData = modifiedSentence.getBytes();
 	      System.out.println("FROM SERVER:" + modifiedSentence);
 	      sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, portNum);
@@ -207,6 +207,7 @@ class remotebank_udp
    }
 
    public static boolean isSuccess(String in) {
+   	System.out.println(in);
 	if (in != null && in.length()!=0 && in.indexOf("<Bal>")!=-1 && (in.substring(0,in.indexOf("<Bal>")).equals("yes") ) ) {
 		return true;
 	}
